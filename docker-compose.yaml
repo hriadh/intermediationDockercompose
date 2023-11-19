@@ -1,0 +1,28 @@
+version: '3'
+services:
+  db: 
+    image: mariadb:10.4
+    environment:
+      - MARIADB_DATABASE=intermediationphp
+      - MARIADB_USER=inter
+      - MARIADB_PASSWORD=password
+      - MARIADB_ALLOW_EMPTY_ROOT_PASSWORD=1
+    volumes:
+      #"./db:/var/lib/mysql"
+      - "./db:/docker-entrypoint-initdb.d" 
+  www:
+    image: php:8.1-apache
+    volumes:
+      - "./app/:/var/www/html" 
+    ports:
+      - 80:80
+      - 443:443 
+    command: ["sh", "-c", "docker-php-ext-install mysqli && docker-php-ext-enable mysqli && apachectl -DFOREGROUND"]
+    
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:5.2
+    ports:
+      - 8001:80
+    environment:
+      - PMA_HOST=db
+      - PMA_PORT=3306
